@@ -1,0 +1,27 @@
+{
+"name": "textpager",
+"title": "jQuery Text Pager",
+"description": "Text Pager - jQuery plugin for create pages on div",
+"keywords": [
+"text",
+"page",
+"pager"
+],
+"version": "1.0.0",
+"author": {
+"name": "Dmitrij Waśkowski",
+"email": "dima@waskowscy.pl",
+"url": "http://dima.waskowscy.pl"
+},
+"licenses": [
+{
+"type": "MIT",
+"url": "http://en.wikipedia.org/wiki/MIT_License"
+}
+],
+"homepage": "https://github.com/dwaskowski/jquery_textpager",
+"docs": "https://github.com/dwaskowski/jquery_textpager",
+"dependencies": {
+"jquery": ">=1.5"
+}
+}
