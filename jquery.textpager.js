@@ -25,12 +25,7 @@
             controlPagesEnabel:     (typeof(options) !== "undefined" && options !== null && typeof(options.controlPagesEnabel) !== "undefined" && options.controlPagesEnabel !== null) ? options.controlPagesEnabel : true,
             controlPagesContent:    (typeof(options) !== "undefined" && options !== null && typeof(options.controlPagesContent) !== "undefined" && options.controlPagesContent !== null) ? options.controlPagesContent : 'div'
         };
-        
-        var fulltextHeight = 0;
-        $(this).children().each(function(){
-            fulltextHeight += $(this).height();
-        });
-        
+        var fulltextHeight = $(this).prop('scrollHeight');
         var textareaHeight = $(this).height();
         var textareaWidth = $(this).width();
         
