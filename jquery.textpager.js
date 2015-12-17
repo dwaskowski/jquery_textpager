@@ -1,4 +1,4 @@
-/**
+ /**
  *  
  *  Text Pager - jQuery plugin for create pages on div
  *  Copyright (c) 2014 Dmitrij Waśkowski
@@ -9,7 +9,7 @@
  *  Project home:
  *  https://github.com/dwaskowski/jquery_textpager
  *  
- *  Version:  1.0
+ *  Version:  1.1.0
  *
  */
 
@@ -25,14 +25,90 @@
             controlPagesEnabel:     (typeof(options) !== "undefined" && options !== null && typeof(options.controlPagesEnabel) !== "undefined" && options.controlPagesEnabel !== null) ? options.controlPagesEnabel : true,
             controlPagesContent:    (typeof(options) !== "undefined" && options !== null && typeof(options.controlPagesContent) !== "undefined" && options.controlPagesContent !== null) ? options.controlPagesContent : 'div'
         };
-        var fulltextHeight = $(this).prop('scrollHeight');
-        var textareaHeight = $(this).height();
-        var textareaWidth = $(this).width();
+        var fulltextHeight = $(this).prop('scrollHeight'),
+            textareaHeight = $(this).height(),
+            textareaWidth = $(this).width();
+        
+        parseContent = function(parent, textareaHeight, fulltextHeight) {
+            var contentHtml = $(parent).html(),
+                html = $.parseHTML(contentHtml),
+                pages = 1;
+            
+            // parser
+            childrenChecker = function(html) {
+                $.each(html, function(i, el) {
+                    //console.log(boxNum+': '+el.nodeName.toLowerCase());
+                    //console.log(el.attributes);
+                    //console.log(el.childNodes);
+                    //console.log(el.nodeValue);
+                    var attributes = el.attributes,
+                        nodeName = el.nodeName.toLowerCase();
+                    
+                    if (nodeName == 'div') {
+                        divLevel++;
+                        divAttrs[divLevel-1] = attributes;
+                        var newTmpPoint = $('<div>');
+                        if (attributes) {
+                            $.each(attributes, function(i, attr) {
+                                newTmpPoint.attr(attr.name, attr.value);
+                            });
+                        }
+                        newTmpPoint.appendTo(tmpBox);
+                        tmpBox = newTmpPoint;
+                        childrenChecker(el.childNodes);
+                        var newTmpPoint = tmpBox.parent();
+                        tmpBox = newTmpPoint;
+                        divLevel--;
+                        return;
+                    }
+                    
+                    var nodeClone = $(el).clone();
+                    tmpBox.append(nodeClone);
+                    
+                    if (tmpBox.height() > textareaHeight) {
+                        nodeClone.detach();
+                        if (divLevel > 0) {
+                            for(var iter=0; iter<divLevel; iter++) {
+                                var newTmpPoint = tmpBox.parent();
+                                tmpBox = newTmpPoint;
+                            }
+                        }
+                        tmpBox.addClass('tp-page-one').css('height',textareaHeight+'px').css('width',textareaWidth+'px');
+                        pages++;
+                        tmpBox = $('<div>').appendTo($(parent));
+                        if (divLevel > 0) {
+                            for(var iter=0; iter<divLevel; iter++) {
+                                var newTmpPoint = $('<div>');
+                                if (divAttrs[iter]) {
+                                    $.each(divAttrs[iter], function(i, attr) {
+                                        newTmpPoint.attr(attr.name, attr.value);
+                                    });
+                                }
+                                newTmpPoint.appendTo(tmpBox);
+                                tmpBox = newTmpPoint;
+                            }
+                        }
+                        tmpBox.append(nodeClone);
+                    }
+                });
+            }
+            
+            $(parent).html('');
+            var boxNum = 1,
+                divLevel = 0,
+                divAttrs = [],
+                tmpBox = $('<div>').appendTo($(parent));
+        
+            childrenChecker(html);
+            tmpBox.addClass('tp-page-one').css('height',textareaHeight+'px').css('width',textareaWidth+'px');
+            return pages;
+        }
         
         if(textareaHeight<fulltextHeight){
-            var pageNow = 1;
-            var margTop = 0;
-            var pages = Math.ceil(fulltextHeight/textareaHeight);
+            var self = this;
+            var pageNow = 1,
+                margTop = 0,
+                pages = parseContent(self, textareaHeight, fulltextHeight);
             
             if (eOptions.controlArrows==='') {
                 $('<div>').addClass('tp-control-arrows').appendTo($(parent));
@@ -60,7 +136,6 @@
             $('<div>').addClass('tp-horizontalbox').css('height',textareaHeight+'px').css('width',textareaWidth+'px').appendTo($(this));
             $('<div>').addClass('tp-vertivalbox').html(contentHtml).css('width',textareaWidth+'px').appendTo($(this).find('.tp-horizontalbox'));
             
-            var self = this;
             $(eOptions.controlArrows).find('.tp-control-arrow-left').unbind('click').click(function(){
                 var thisPage = pageNow-1;
                 if(thisPage<1){
