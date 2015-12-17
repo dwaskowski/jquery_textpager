@@ -48,6 +48,6 @@ Plugin is released under the [MIT License](http://en.wikipedia.org/wiki/MIT_Lice
 ##Versions
 
 * 1.0.0 - Firest reles
-
+* 1.1.0 - Added parser and min version
 
 
